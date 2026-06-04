@@ -62,6 +62,7 @@ useEffect(() => {
 
 }, [])
 const [explosions, setExplosions] = useState([])
+const [ripples, setRipples] = useState([])
 
 const [selectedProject, setSelectedProject] =
 useState(null)
@@ -160,22 +161,18 @@ const yMedium = useTransform(scrollYProgress, [0, 1], [0, -400])
 
   id: Date.now() + Math.random(),
 },
-  ].slice(-50))
+  ].slice(-100))
 
 }
 
-const createExplosion = (e) => {
+const createExplosion = (x, y) => {
 
   const particles = Array.from({ length: 20 }).map(() => ({
     id: Date.now() + Math.random(),
-
-    x: e.clientX,
-    y: e.clientY,
-
-    dx: (Math.random() - 0.5) * 300,
-    dy: (Math.random() - 0.5) * 300,
-
-    size: Math.random() * 12 + 8,
+    x,
+    y,
+    offsetX: (Math.random() - 0.5) * 200,
+    offsetY: (Math.random() - 0.5) * 200,
   }))
 
   setExplosions((prev) => [
@@ -183,8 +180,18 @@ const createExplosion = (e) => {
     ...particles,
   ])
 
-}
+  const now = Date.now()
 
+setRipples((prev) => [
+  ...prev,
+
+  { id: now + 1, x, y, delay: 0 },
+
+  { id: now + 2, x, y, delay: 0.15 },
+
+  { id: now + 3, x, y, delay: 0.3 },
+])
+}
   const floatingThoughts = [
 
     "future nobel prize holder maybe",
@@ -526,6 +533,49 @@ const magneticLeave = (e) => {
     </span>
 
   </motion.div>
+
+))}
+{/* FROST RIPPLE */}
+
+{ripples.map((ripple) => (
+
+  <motion.div
+    key={ripple.id}
+
+    initial={{
+      scale: 0,
+      opacity: 0.8,
+    }}
+
+    animate={{
+      scale: 8,
+      opacity: 0,
+    }}
+
+    transition={{
+  duration: 1.2,
+  delay: ripple.delay,
+  ease: "easeOut",
+}}
+
+    className="fixed pointer-events-none z-[997]"
+
+    style={{
+      left: ripple.x - 40,
+      top: ripple.y - 40,
+      width: "80px",
+      height: "80px",
+      borderRadius: "9999px",
+
+      border:
+        "2px solid rgba(255,255,255,0.8)",
+
+      boxShadow: `
+        0 0 20px rgba(255,255,255,0.8),
+        0 0 60px rgba(180,220,255,0.8)
+      `,
+    }}
+  />
 
 ))}
       {/* CURSOR OUTER RING */}
